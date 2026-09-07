@@ -1,0 +1,17 @@
+[project]
+name = "warp-tests-webinar"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "IAmTheDoctor8", email = "egor-yoda@yandex.ru" }
+]
+requires-python = ">=3.14"
+dependencies = []
+
+[project.scripts]
+warp-tests-webinar = "warp_tests_webinar:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"

@@ -1,0 +1,24 @@
+warp:
+  api: v1
+  benchmark: get
+  quiet: false
+  no-color: false
+  json: false
+  bench-data: {{ .BENCH_DATA }}
+  # S3 connection and target parameters
+  remote:
+    region: ru-central1
+    access-key: {{ .S3_ACCESS_KEY }}
+    secret-key: {{ .S3_SECRET_KEY }}
+    host: {{ .S3_ENDPOINT }}
+    bucket: "warm-warp-test" 
+    tls: true
+    insecure: false  
+  # Benchmark parameters configuration
+  params: # This bucket will be cleared before and after the test
+    duration: 10s                       # Duration of the benchmark (e.g., 5m, 1h)
+    objects: 10
+    obj:
+      size: 4MiB                     # Size of objects (e.g., 100KiB, 10MiB, 1GiB)
+      # versions: 2
+      rand-size: false
