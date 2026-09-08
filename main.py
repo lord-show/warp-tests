@@ -46,7 +46,7 @@ def get_benchmark_files(benchmark_dir: str) -> list:
     return relative_paths
 
 def get_cmd(config_file: str, variables: dict) -> list:
-    variables["BENCH_DATA"] = variables["BENCH_DATA"] / Path(config_file).stem
+    variables["BENCH_DATA"] = variables["BENCH_DATA"] / (Path(config_file).stem + variables["BUCKET"])
     cmd = ["warp", "run", config_file] 
     if variables:
         for key, value in variables.items():
@@ -92,8 +92,6 @@ def run_warp_benchmark(config_file: str, variables: dict) -> bool:
         print(f"❌ Непредвиденная ошибка при запуске {config_file}: {e}")
         return False
 
-
-
 def main():
 
     """uv run --env-file .env python main.py"""
@@ -107,8 +105,18 @@ def main():
         "S3_ENDPOINT" : os.environ.get("S3_ENDPOINT"),
         "S3_ACCESS_KEY": os.environ.get("S3_ACCESS_KEY"),
         "S3_SECRET_KEY": os.environ.get("S3_SECRET_KEY"),
+        "DURATION" : "10s",
+        "OBJECTS_NUM": "10",
+        "OBJECTS_SIZE": "4MB",
+        "BUCKET" : "warm-warp-test" ,
         "BENCH_DATA": results_folder,
+        "TLS": "true",
+        "INSECURE": "false",
     }
+
+    bucket_list = ["warm-warp-test", "cold-warp-test"]
+    object_size_list = ["128КБ", "1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ"]
+    # object_rand_size_list = ["1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ", "100ГБ"]
     
     print("🔍 Поиск конфигурационных файлов в папке 'benchmark'...")
     
@@ -118,18 +126,22 @@ def main():
         print("📭 Нет файлов для запуска. Завершение работы.")
         return
 
-    print(f"📄 Найдено {len(config_files)} файлов:")
-    for f in config_files:
-        print(f"   - {f}")
+    print(f"📄 Найдено {len(config_files)} конигураций")
+    # for f in config_files:
+    #     print(f"   - {f}")
+
+    
 
     print("🚀 Начинаем последовательный запуск бенчмарков...")
     
     failed = []
     for i, config_file in enumerate(config_files, 1):
         print(f"\n[{i}/{len(config_files)}]")
-        success = run_warp_benchmark(config_file,variables)
-        if not success:
-            failed.append(config_file)
+        for bucket in bucket_list:
+            variables["BUCKET"] = bucket
+            success = run_warp_benchmark(config_file,variables)
+            if not success:
+                failed.append(config_file)
 
     # Итоговый отчёт
     print(f"\n{'='*60}")
