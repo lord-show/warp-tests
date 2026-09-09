@@ -106,17 +106,12 @@ def main():
         "S3_ACCESS_KEY": os.environ.get("S3_ACCESS_KEY"),
         "S3_SECRET_KEY": os.environ.get("S3_SECRET_KEY"),
         "DURATION" : "10s",
-        "OBJECTS_NUM": "10",
-        "OBJECTS_SIZE": "4MB",
-        "BUCKET" : "warm-warp-test" ,
+        "BUCKET" : "" ,
         "BENCH_DATA": results_folder,
         "TLS": "true",
         "INSECURE": "false",
     }
-
     bucket_list = ["warm-warp-test", "cold-warp-test"]
-    object_size_list = ["128КБ", "1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ"]
-    # object_rand_size_list = ["1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ", "100ГБ"]
     
     print("🔍 Поиск конфигурационных файлов в папке 'benchmark'...")
     

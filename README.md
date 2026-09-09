@@ -1,31 +1,87 @@
-becnchmarks
-    fix_size
-        get
-            get128KB
-            get1MB
-            get10MB
-            get100MB
-            get1GB
-            get10GB
-        put
-        mixed
-    rand_size
-        get
-        put
-        mixed
 
-bucket_list = ["warm-warp-test", "cold-warp-test", "standard-warp-test"]
-object_size_list = ["128КБ", "1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ"]
-object_rand_size_list = ["1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ", "10ГБ"]
+# 🚀 S3 Benchmark Automation (MinIO Warp)
 
+Автоматизированный скрипт для проведения нагрузочного тестирования S3-совместимых хранилищ с использованием [MinIO Warp](https://github.com/minio/warp). 
 
-Добавить итерации по размерам объектов
-для get и mixed сделать отдельные циклы
+Скрипт автоматически прогоняет набор YAML-конфигов через заданный список бакетов и сохраняет сжатые результаты тестов.
 
-Всего получиться 
-    get put mixed 3 метода 
-    bucket_list = ["warm-warp-test", "cold-warp-test"] 2
-    object_size_list = ["128КБ", "1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ"] 6
-    # object_rand_size_list = ["1МБ", "10МБ", "100МБ", "1ГБ", "10ГБ", "100ГБ"] 6
+## 📋 Требования и Установка
 
-    72 варианта по 20 мин = 1440 мин = 24 часа
+1. **Установите MinIO WARP** 
+   Скачайте и установите [warp](https://github.com/minio/warp/releases), обязательно добавьте его в системный `$PATH`.
+2. **Установите uv** 
+   Установите менеджер пакетов [uv](https://docs.astral.sh/uv/getting-started/installation/).
+3. **Скачайте репозиторий**
+   ```bash
+   git clone <url-репозитория>
+   cd <имя-репозитория>
+   ```
+4. **Подготовьте переменные окружения**
+   ```bash
+   cp .env.template .env
+   ```
+5. **Заполните `.env`**
+   Укажите ваши `S3_ENDPOINT`, `S3_ACCESS_KEY` и `S3_SECRET_KEY`.
+
+---
+
+## ⚙️ Настройка экспериментов
+
+> **Примечание:** *Блок с переменными сделан "на коленке", чтобы быстро работало. Предельное время эксперимента и целевые бакеты задаются напрямую в коде.*
+
+Откройте `main.py` (или соответствующий файл конфигурации) и отредактируйте следующие параметры:
+
+```python
+variables = {
+    "S3_ENDPOINT" : os.environ.get("S3_ENDPOINT"),
+    "S3_ACCESS_KEY": os.environ.get("S3_ACCESS_KEY"),
+    "S3_SECRET_KEY": os.environ.get("S3_SECRET_KEY"),
+    
+    # ⚠️ Укажите максимальную длительность. Рекомендуется от 20m
+    "DURATION" : "10s",                                     
+    
+    "BUCKET" : "",
+    "BENCH_DATA": results_folder,
+    "TLS": "true",
+    "INSECURE": "false",
+}
+
+# ⚠️ Укажите список тестируемых бакетов
+bucket_list = ["warm-warp-test", "cold-warp-test"]          
+```
+
+---
+
+## ▶️ Запуск
+
+Запуск всех тестов осуществляется одной командой:
+
+```bash
+uv run --env-file .env main.py
+```
+
+---
+
+## 🧠 Логика работы
+
+1. Скрипт сканирует папку `benchmarks/` и забирает оттуда все `.yml` конфиги экспериментов.
+2. Запускается вложенный цикл прогона тестов:
+   - **Внешний цикл:** по каждому YAML-конфигу.
+   - **Внутренний цикл:** по каждому бакету из `bucket_list`.
+3. *Текущее количество прогонов:* **66**.
+
+### 📂 Результаты
+
+По итогу выполнения в директории `results/` создается папка с именем, соответствующим времени запуска (`datetime.now().strftime("%Y-%m-%d_%H-%M-%S")`).
+
+Внутри неё в формате `{config_name}_{bucket_name}.json.zst` записываются результаты всех прогонов warp.
+
+**Структура вывода:**
+```text
+results/
+└── 2026-09-09_14-30-00/
+    ├── get_config_warm-warp-test.json.zst
+    ├── get_config_cold-warp-test.json.zst
+    ├── put_config_warm-warp-test.json.zst
+    └── ...
+```
