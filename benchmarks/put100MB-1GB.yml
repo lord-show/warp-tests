@@ -1,6 +1,6 @@
 warp:
   api: v1
-  benchmark: get
+  benchmark: put
   quiet: false
   no-color: false
   json: false
@@ -17,8 +17,6 @@ warp:
   # Benchmark parameters configuration
   params: # This bucket will be cleared before and after the test
     duration: {{ .DURATION }}
-    objects: 10
     obj:
-      size: 1GB
+      size: 100MB,1GB
       rand-size: true
-      range-size: 10GB

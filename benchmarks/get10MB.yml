@@ -1,6 +1,6 @@
 warp:
   api: v1
-  benchmark: put
+  benchmark: get
   quiet: false
   no-color: false
   json: false
@@ -11,10 +11,13 @@ warp:
     access-key: {{ .S3_ACCESS_KEY }}
     secret-key: {{ .S3_SECRET_KEY }}
     host: {{ .S3_ENDPOINT }}
-    bucket: "warm-warp-test"
-    tls: true
-    insecure: false
+    bucket: {{ .BUCKET }}
+    tls: {{ .TLS }}
+    insecure: {{ .INSECURE }}
   # Benchmark parameters configuration
   params: # This bucket will be cleared before and after the test
-    duration: 10s                       # Duration of the benchmark (e.g., 5m, 1h)
-    obj.size: 4MiB                     # Size of objects (e.g., 100KiB, 10MiB, 1GiB)
+    duration: {{ .DURATION }}
+    objects: 1000
+    obj:
+      size: 10MB
+      rand-size: false

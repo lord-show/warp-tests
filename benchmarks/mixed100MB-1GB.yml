@@ -19,5 +19,5 @@ warp:
     duration: {{ .DURATION }}
     objects: 10
     obj:
-      size: 10GB
-      rand-size: false
+      size: 100MB,1GB
+      rand-size: true

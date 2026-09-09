@@ -17,8 +17,6 @@ warp:
   # Benchmark parameters configuration
   params: # This bucket will be cleared before and after the test
     duration: {{ .DURATION }}
-    objects: 10
     obj:
-      size: 1GB
-      rand-size: true
-      range-size: 10GB
+      size: 10MB
+      rand-size: false
