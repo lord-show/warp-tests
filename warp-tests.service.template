@@ -1,0 +1,25 @@
+[Unit]
+Description=Warp S3 Benchmark (cyclic runner)
+After=network.target
+
+[Service]
+Type=simple
+User=your_username
+Group=your_group
+WorkingDirectory=/path/to/warp-tests
+ExecStart=/usr/bin/uv run --env-file .env main.py
+
+# Циклический запуск
+Restart=always
+RestartSec=30
+
+# Чтобы systemd не "сдался" после нескольких перезапусков подряд
+StartLimitIntervalSec=0
+
+# Логи
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=warp-tests
+
+[Install]
+WantedBy=multi-user.target

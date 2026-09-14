@@ -105,7 +105,7 @@ def main():
         "S3_ENDPOINT" : os.environ.get("S3_ENDPOINT"),
         "S3_ACCESS_KEY": os.environ.get("S3_ACCESS_KEY"),
         "S3_SECRET_KEY": os.environ.get("S3_SECRET_KEY"),
-        "DURATION" : "10s",
+        "DURATION" : "20m",
         "BUCKET" : "" ,
         "BENCH_DATA": results_folder,
         "TLS": "true",

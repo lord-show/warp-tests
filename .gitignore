@@ -12,3 +12,4 @@ wheels/
 
 results/*
 temp/*
+warp-tests.service

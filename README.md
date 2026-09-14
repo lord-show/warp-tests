@@ -62,6 +62,80 @@ uv run --env-file .env main.py
 
 ---
 
+
+## ▶️ Циклический запуск в качестве сервиса (systemd)
+
+Сервис запускает `main.py`, дожидается завершения, ждёт 30 секунд
+и запускает снова — бесконечно. Автоматически стартует при загрузке ОС.
+
+### 1. Подготовьте unit-файл
+
+Скопируйте шаблон и откройте его на редактирование:
+
+```bash
+cp warp-tests.service.template warp-tests.service
+nano warp-tests.service
+```
+
+Обязательно проверьте в файле:
+- `User=` — под каким пользователем запускать (не root);
+- `Group=` — соответствующая группа;
+- `WorkingDirectory=` — абсолютный путь до проекта;
+- `ExecStart=` — путь до `uv` (узнать: `which uv`) и до `main.py`.
+
+### 2. Установите сервис
+
+```bash
+sudo cp warp-tests.service /etc/systemd/system/
+sudo systemctl daemon-reload
+```
+
+### 3. Включите автозапуск и стартуйте
+
+```bash
+sudo systemctl enable --now warp-tests.service
+```
+
+### Наблюдение за работой
+
+```bash
+# Логи в реальном времени (аналог консоли)
+journalctl -u warp-tests.service -f
+
+# Последние 200 строк
+journalctl -u warp-tests.service -n 200
+
+# Текущий статус: активна ли, сколько раз перезапускалась, PID
+systemctl status warp-tests.service
+```
+
+### Управление сервисом
+
+```bash
+# Остановить (текущий цикл прервётся, следующий не запустится)
+sudo systemctl stop warp-tests.service
+
+# Запустить снова
+sudo systemctl start warp-tests.service
+
+# Перезапустить (например, после правки unit-файла;
+# перед этим не забудьте `sudo systemctl daemon-reload`)
+sudo systemctl restart warp-tests.service
+
+# Убрать из автозапуска
+sudo systemctl disable warp-tests.service
+```
+
+### Если правите unit-файл
+
+После любого изменения `/etc/systemd/system/warp-tests.service`:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart warp-tests.service
+```
+---
+
 ## 🧠 Логика работы
 
 1. Скрипт сканирует папку `benchmarks/` и забирает оттуда все `.yml` конфиги экспериментов.
